@@ -81,15 +81,17 @@ func ListenToWs(conn *WebSocketConnection) {
 	for {
 		e := <-wsChann
 		response.Message = "Some message with action " + e.Action
+
+		BroadcastToAll(response)
 	}
 }
 
 // broadcastToAll sends ws response to all connected clients
-func BroadcastToAll(resp *wsJsonResponse) {
+func BroadcastToAll(resp wsJsonResponse) {
 	for client := range clients {
 		err := client.Conn.WriteJSON(resp)
 		if err != nil {
-			
+
 			logger.Error("---Error-> BroadcastToAll--->", err.Error())
 			_ = client.Conn.Close()
 			delete(clients, client)
